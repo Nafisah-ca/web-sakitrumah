@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="{{ $metaDesc ?? 'RS Sari Sehat Group - Melayani dengan Kasih Sayang. Rumah Sakit terpercaya di Tangerang dan Banten.' }}">
+<title>{{ $title ?? 'RS Sari Sehat' }} | Melayani dengan Kasih Sayang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+@if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+    @vite(['resources/css/app.css','resources/js/app.js'])
+@else
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+    <link rel="stylesheet" href="{{ asset('css/fallback.css') }}">
+@endif
+@stack('styles')
+</head>
+<body class="font-sans antialiased bg-white text-gray-800">
+
+{{-- ===== TOPBAR ===== --}}
+<div class="topbar hidden md:block">
+    <div class="max-w-screen-xl mx-auto px-4">
+        <div class="flex items-center justify-between h-10">
+            <div class="flex items-center gap-5 text-xs text-gray-600">
+                <a href="{{ route('cabang') }}" class="flex items-center gap-1.5 hover:text-green-600 transition-colors font-semibold">
+                    <i class="fas fa-map-marker-alt text-green-600"></i> Lokasi
+                </a>
+                <a href="{{ route('live.antrian') }}" class="flex items-center gap-2 hover:text-green-600 transition-colors font-semibold">
+                    <span class="live-badge">Live</span> Live Antrian
+                </a>
+                <span class="flex items-center gap-1.5 text-gray-500" id="jam-sholat">
+                    <i class="fas fa-mosque text-green-600 text-xs"></i>
+                    <span id="waktu-sholat">Loading...</span>
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://www.instagram.com/rssarisehat/" target="_blank" rel="noopener" aria-label="Instagram"
+                   class="text-gray-500 hover:text-pink-500 transition-colors text-sm"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/rssarisehat/" target="_blank" rel="noopener" aria-label="Facebook"
+                   class="text-gray-500 hover:text-blue-600 transition-colors text-sm"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/@RSSariSehat" target="_blank" rel="noopener" aria-label="YouTube"
+                   class="text-gray-500 hover:text-red-500 transition-colors text-sm"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@rssarisehat" target="_blank" rel="noopener" aria-label="TikTok"
+                   class="text-gray-500 hover:text-gray-900 transition-colors text-sm"><i class="fab fa-tiktok"></i></a>
+                <a href="https://open.spotify.com" target="_blank" rel="noopener" aria-label="Spotify"
+                   class="text-gray-500 hover:text-green-500 transition-colors text-sm"><i class="fab fa-spotify"></i></a>
+                <div class="w-px h-4 bg-gray-200"></div>
+                @auth
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-1.5 text-xs font-semibold text-gray-700 hover:text-green-600 transition-colors">
+                        <div class="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-[10px]"></i>
+                        </div>
+                        {{ Str::limit(Auth::user()->name, 14) }}
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors">
+                            <i class="fas fa-sign-out-alt text-xs"></i> Keluar
+                        </button>
+                    </form>
+                </div>
+                @else
+                <a href="{{ route('login') }}" class="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-green-600 transition-colors">
+                    <i class="fas fa-user text-xs"></i> Masuk
+                </a>
+                @endauth
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ===== NAVBAR UTAMA ===== --}}
+<nav id="navbar-main" class="navbar-main">
+    <div class="max-w-screen-xl mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            {{-- LOGO --}}
+            <a href="{{ route('home') }}" class="flex items-center gap-3 flex-shrink-0 group">
+                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                    <i class="fas fa-hospital-alt text-green-600 text-lg"></i>
+                </div>
+                <div class="hidden sm:block">
+                    <div class="text-white font-extrabold text-lg leading-tight tracking-tight">RS Sari Sehat</div>
+                    <div class="text-green-100 text-[10px] font-semibold tracking-widest uppercase">Melayani dengan Kasih Sayang</div>
+                </div>
+            </a>
+
+            {{-- DESKTOP NAV --}}
+            <div class="hidden lg:flex items-center gap-1">
+                <a href="{{ route('home') }}" class="nav-item {{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a>
+
+                <div class="nav-dropdown">
+                    <button class="nav-item flex items-center gap-1">
+                        Pelayanan <i class="fas fa-chevron-down text-[10px] opacity-80"></i>
+                    </button>
+                    <div class="nav-dropdown-menu">
+                        @foreach([
+                            ['fa-stethoscope','Pelayanan Utama','layanan'],
+                            ['fa-star','Pelayanan Khusus','layanan'],
+                            ['fa-heartbeat','Pusat Layanan Ibu & Anak','layanan'],
+                            ['fa-spa','Pain Clinic & Wellness','layanan'],
+                            ['fa-clipboard-check','Medical Check-Up','mcu'],
+                        ] as [$ico,$lbl,$rt])
+                        <a href="{{ route($rt) }}" class="nav-dropdown-item">
+                            <i class="fas {{ $ico }} text-green-500 w-4 text-center"></i> {{ $lbl }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="nav-dropdown">
+                    <button class="nav-item flex items-center gap-1">
+                        Dokter <i class="fas fa-chevron-down text-[10px] opacity-80"></i>
+                    </button>
+                    <div class="nav-dropdown-menu">
+                        @foreach([
+                            ['fa-calendar-check','Daftar Poliklinik','dokter'],
+                            ['fa-laptop-medical','Layanan Online','dokter.online'],
+                            ['fa-user-md','Profil Dokter','dokter'],
+                        ] as [$ico,$lbl,$rt])
+                        <a href="{{ route($rt) }}" class="nav-dropdown-item">
+                            <i class="fas {{ $ico }} text-green-500 w-4 text-center"></i> {{ $lbl }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <a href="{{ route('promo') }}" class="nav-item {{ request()->routeIs('promo*') ? 'active' : '' }}">Promo</a>
+                <a href="{{ route('cabang') }}" class="nav-item {{ request()->routeIs('cabang') ? 'active' : '' }}">Cabang</a>
+
+                <div class="nav-dropdown">
+                    <button class="nav-item flex items-center gap-1">
+                        Informasi <i class="fas fa-chevron-down text-[10px] opacity-80"></i>
+                    </button>
+                    <div class="nav-dropdown-menu">
+                        @foreach([
+                            ['fa-newspaper','Artikel','artikel'],
+                            ['fa-calendar-alt','Jadwal Kegiatan','event'],
+                            ['fa-info-circle','Tentang Kami','tentang'],
+                        ] as [$ico,$lbl,$rt])
+                        <a href="{{ route($rt) }}" class="nav-dropdown-item">
+                            <i class="fas {{ $ico }} text-green-500 w-4 text-center"></i> {{ $lbl }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <a href="{{ route('cabang') }}#hubungi" class="nav-item {{ request()->routeIs('kontak') ? 'active' : '' }}">Hubungi Kami</a>
+            </div>
+
+            {{-- DAFTAR BTN --}}
+            <div class="hidden lg:flex items-center gap-3">
+                <a href="{{ route('dokter') }}" class="flex items-center gap-2 bg-white text-green-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-green-50 transition-all shadow-sm">
+                    <i class="fas fa-calendar-check text-green-600"></i> Daftar Poliklinik
+                </a>
+            </div>
+
+            {{-- HAMBURGER --}}
+            <button id="hamburger-btn" class="lg:hidden text-white p-2 rounded-lg hover:bg-white/15 transition-colors" aria-label="Menu">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+{{-- MOBILE MENU PANEL --}}
+<div id="mobile-menu-panel">
+    <div id="mobile-overlay"></div>
+    <div id="mobile-drawer">
+        <div class="bg-green-600 p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+                    <i class="fas fa-hospital-alt text-green-600"></i>
+                </div>
+                <div>
+                    <div class="text-white font-bold text-sm">RS Sari Sehat</div>
+                    <div class="text-green-100 text-[10px]">Melayani dengan Kasih Sayang</div>
+                </div>
+            </div>
+            <button id="close-drawer" class="text-white p-1"><i class="fas fa-times text-lg"></i></button>
+        </div>
+        <div class="p-4 space-y-1">
+            @foreach([
+                ['fa-home','Beranda','home'],
+                ['fa-stethoscope','Pelayanan','layanan'],
+                ['fa-user-md','Dokter','dokter'],
+                ['fa-tags','Promo','promo'],
+                ['fa-map-marker-alt','Cabang','cabang'],
+                ['fa-newspaper','Artikel','artikel'],
+                ['fa-calendar-alt','Kegiatan','event'],
+                ['fa-info-circle','Tentang Kami','tentang'],
+                ['fa-phone','Hubungi Kami','cabang'],
+            ] as [$ico,$lbl,$rt])
+            <a href="{{ route($rt) }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-green-50 hover:text-green-700 font-semibold transition-colors text-sm">
+                <i class="fas {{ $ico }} text-green-500 w-4 text-center"></i> {{ $lbl }}
+            </a>
+            @endforeach
+            <div class="pt-3">
+                <a href="{{ route('dokter') }}" class="block w-full text-center btn-green py-3 rounded-xl font-bold">
+                    <i class="fas fa-calendar-check mr-2"></i>Daftar Poliklinik
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- MAIN --}}
+<main>@yield('content')</main>
+
+{{-- ===== SOCIAL MEDIA SECTION ===== --}}
+<section class="social-section py-12">
+    <div class="max-w-screen-xl mx-auto px-4 text-center">
+        <div class="mb-6">
+            <span class="text-green-400 text-xs font-black uppercase tracking-widest block mb-2">Follow</span>
+            <h2 class="text-white text-2xl font-extrabold">Sosial Media Kami</h2>
+        </div>
+        <div class="flex flex-wrap justify-center gap-4">
+            @foreach([
+                ['fab fa-instagram','Instagram','@rssarisehat','bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400','https://instagram.com'],
+                ['fab fa-facebook-f','Facebook','RS Sari Sehat','bg-blue-600','https://facebook.com'],
+                ['fab fa-youtube','YouTube','RS Sari Sehat Group','bg-red-600','https://youtube.com'],
+                ['fab fa-tiktok','TikTok','@rssarisehat','bg-gray-900','https://tiktok.com'],
+                ['fab fa-spotify','Spotify','RS Sari Sehat Podcast','bg-green-500','https://spotify.com'],
+            ] as [$icon,$platform,$handle,$bg,$url])
+            <a href="{{ $url }}" target="_blank" rel="noopener"
+               class="flex items-center gap-3 {{ $bg }} text-white px-5 py-3 rounded-xl font-semibold text-sm hover:opacity-90 hover:-translate-y-1 transition-all shadow-lg">
+                <i class="{{ $icon }} text-lg"></i>
+                <div class="text-left">
+                    <div class="text-xs opacity-80">{{ $platform }}</div>
+                    <div class="font-bold text-sm">{{ $handle }}</div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- ===== FOOTER ===== --}}
+<footer class="footer-main text-white">
+    <div class="max-w-screen-xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            {{-- Brand --}}
+            <div class="lg:col-span-1">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-11 h-11 rounded-xl bg-green-600 flex items-center justify-center">
+                        <i class="fas fa-hospital-alt text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="font-extrabold text-base text-white">RS Sari Sehat</div>
+                        <div class="text-green-400 text-[10px] font-semibold uppercase tracking-wider">Melayani dengan Kasih Sayang</div>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm leading-relaxed mb-5">
+                    Group Rumah Sakit di Tangerang dan Banten yang mengutamakan pelayanan kesehatan berkualitas dengan penuh kasih sayang.
+                </p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-phone text-green-500 w-4"></i>
+                        <a href="tel:02150943838" class="text-gray-300 hover:text-white transition-colors">(021) 5094-3838</a>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-envelope text-green-500 w-4"></i>
+                        <a href="mailto:info@sarisehat.id" class="text-gray-300 hover:text-white transition-colors">info@sarisehat.id</a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Menu --}}
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4 uppercase tracking-wider">Menu</h4>
+                <ul class="space-y-2.5">
+                    @foreach([['Tentang Kami','tentang'],['Jadwal Dokter','dokter'],['Cabang','cabang'],['Hubungi Kami','cabang']] as [$lbl,$rt])
+                    <li>
+                        <a href="{{ route($rt) }}" class="text-gray-400 hover:text-green-400 text-sm transition-colors flex items-center gap-2">
+                            <i class="fas fa-chevron-right text-green-600 text-xs"></i> {{ $lbl }}
+                        </a>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            {{-- Informasi --}}
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4 uppercase tracking-wider">Informasi</h4>
+                <ul class="space-y-2.5">
+                    @foreach([['Promo','promo'],['Artikel','artikel'],['Jadwal Kegiatan','event'],['Medical Check-Up','mcu'],['Live Antrian','live.antrian']] as [$lbl,$rt])
+                    <li>
+                        <a href="{{ route($rt) }}" class="text-gray-400 hover:text-green-400 text-sm transition-colors flex items-center gap-2">
+                            <i class="fas fa-chevron-right text-green-600 text-xs"></i> {{ $lbl }}
+                        </a>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            {{-- Cabang --}}
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4 uppercase tracking-wider">Cabang Kami</h4>
+                <ul class="space-y-2">
+                    @foreach(['Karawaci','Cipondoh','Sangiang','Ciledug','Serang','Bintaro','Ciputat','Tangerang Kota'] as $c)
+                    <li class="text-gray-400 text-sm flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt text-green-600 text-xs w-3"></i>{{ $c }}
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {{-- Akreditasi --}}
+    <div class="border-t border-white/10">
+        <div class="max-w-screen-xl mx-auto px-4 py-4">
+            <div class="flex flex-wrap justify-center gap-3 items-center">
+                <span class="text-gray-500 text-xs font-semibold">Terakreditasi:</span>
+                @foreach(['KARS Paripurna','ISO 9001:2015','SNARS Edisi 1.1','BPJS Kesehatan','Kemenkes RI'] as $a)
+                <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs text-green-400 font-bold">{{ $a }}</span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    {{-- Copyright --}}
+    <div class="border-t border-white/10">
+        <div class="max-w-screen-xl mx-auto px-4 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500">
+                <span>&copy; {{ date('Y') }} RS Sari Sehat. All rights reserved.</span>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-green-400 transition-colors">Kebijakan Privasi</a>
+                    <a href="#" class="hover:text-green-400 transition-colors">Syarat Ketentuan</a>
+                    <a href="#" class="hover:text-green-400 transition-colors">Kebijakan Cookie</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{{-- BACK TO TOP --}}
+<button id="back-to-top" aria-label="Kembali ke atas"
+    class="fixed bottom-6 right-6 w-11 h-11 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center justify-center">
+    <i class="fas fa-arrow-up text-sm"></i>
+</button>
+
+{{-- WHATSAPP FLOAT --}}
+<a href="https://wa.me/6221509438380" target="_blank" rel="noopener" aria-label="WhatsApp"
+   class="fixed bottom-20 right-6 w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110 z-50 group">
+    <i class="fab fa-whatsapp text-2xl"></i>
+    <span class="absolute right-full mr-3 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        Chat WhatsApp
+    </span>
+</a>
+
+@stack('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Navbar scroll
+    const navbar = document.getElementById('navbar-main');
+    window.addEventListener('scroll', () => {
+        navbar && navbar.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Mobile menu
+    const hamburger = document.getElementById('hamburger-btn');
+    const panel = document.getElementById('mobile-menu-panel');
+    const overlay = document.getElementById('mobile-overlay');
+    const closeBtn = document.getElementById('close-drawer');
+    function openMenu() { panel && panel.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeMenu() { panel && panel.classList.remove('open'); document.body.style.overflow = ''; }
+    hamburger && hamburger.addEventListener('click', openMenu);
+    overlay && overlay.addEventListener('click', closeMenu);
+    closeBtn && closeBtn.addEventListener('click', closeMenu);
+
+    // Back to top
+    const btt = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+        if (!btt) return;
+        if (window.scrollY > 400) { btt.classList.remove('opacity-0','pointer-events-none'); }
+        else { btt.classList.add('opacity-0','pointer-events-none'); }
+    });
+    btt && btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Fade-up observer
+    const fadeEls = document.querySelectorAll('.fade-up');
+    if (fadeEls.length) {
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        fadeEls.forEach(el => obs.observe(el));
+    }
+
+    // Counter animation
+    function animateCount(el) {
+        const target = parseInt(el.dataset.count);
+        const dur = 1800;
+        const step = target / (dur / 16);
+        let curr = 0;
+        const t = setInterval(() => {
+            curr = Math.min(curr + step, target);
+            el.textContent = Math.floor(curr).toLocaleString('id-ID');
+            if (curr >= target) clearInterval(t);
+        }, 16);
+    }
+    const statsSection = document.getElementById('stats-section');
+    if (statsSection) {
+        const so = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.querySelectorAll('[data-count]').forEach(animateCount);
+                    so.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        so.observe(statsSection);
+    }
+
+    // Hero Slider
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    let current = 0, timer;
+    function goTo(n) {
+        slides[current].classList.remove('active');
+        dots[current] && dots[current].classList.remove('active');
+        current = (n + slides.length) % slides.length;
+        slides[current].classList.add('active');
+        dots[current] && dots[current].classList.add('active');
+    }
+    function startAuto() { timer = setInterval(() => goTo(current + 1), 5000); }
+    function stopAuto() { clearInterval(timer); }
+    if (slides.length) {
+        slides[0].classList.add('active');
+        dots[0] && dots[0].classList.add('active');
+        startAuto();
+        document.querySelector('.slide-arrow.prev') && document.querySelector('.slide-arrow.prev').addEventListener('click', () => { stopAuto(); goTo(current - 1); startAuto(); });
+        document.querySelector('.slide-arrow.next') && document.querySelector('.slide-arrow.next').addEventListener('click', () => { stopAuto(); goTo(current + 1); startAuto(); });
+        dots.forEach((d, i) => d.addEventListener('click', () => { stopAuto(); goTo(i); startAuto(); }));
+    }
+
+    // Waktu sholat display (simple clock)
+    function updateClock() {
+        const el = document.getElementById('waktu-sholat');
+        if (!el) return;
+        const now = new Date();
+        const h = now.getHours();
+        const sholat = h < 5 ? 'Subuh' : h < 12 ? 'Dzuhur' : h < 15 ? 'Ashar' : h < 18 ? 'Maghrib' : h < 19 ? 'Isya' : 'Subuh';
+        el.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} ${sholat}`;
+    }
+    updateClock(); setInterval(updateClock, 60000);
+});
+</script>
+</body>
+</html>
