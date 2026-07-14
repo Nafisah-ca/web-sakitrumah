@@ -43,7 +43,7 @@
                         <span class="text-yellow-300">Tanpa Operasi</span>
                     </h1>
                     <p class="text-orange-100 text-base mb-7 leading-relaxed max-w-md">
-                        Terapi Radio Frekuensi, Platelet-Rich Plasma, dan metode terkini untuk mengatasi nyeri sendi, tulang belakang, dan otot.
+                        Terapi radio terfrekuensi, Platelet-Rich Plasma, dan metode terkini untuk mengatasi nyeri sendi, tulang belakang, dan otot.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <a href="{{ route('dokter') }}" class="flex items-center gap-2 bg-white text-orange-700 px-6 py-3 rounded-xl font-bold text-sm shadow-xl hover:bg-orange-50 transition-all hover:-translate-y-0.5">
