@@ -13,7 +13,11 @@
                     <span class="inline-block bg-white/20 border border-white/30 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-widest backdrop-blur-sm">Pusat Layanan Ibu & Anak</span>
                     <h1 class="text-white font-black text-4xl md:text-5xl leading-tight mb-4">
                         Kesehatan Ibu & Anak<br>
+<<<<<<< HEAD
                         <span class="text-yellow-300">Prioritas kita mantap</span>
+=======
+                        <span class="text-yellow-300">Prioritas kita ini</span>
+>>>>>>> 54f6179a5559a90f69c9322d1730d6cc2c09abfb
                     </h1>
                     <p class="text-green-100 text-base mb-7 leading-relaxed max-w-md">
                         Layanan maternal dan pediatri terpadu dengan dokter spesialis berpengalaman dan fasilitas modern di 8 cabang kami.
