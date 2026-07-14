@@ -8,7 +8,7 @@
         <nav class="flex items-center justify-center gap-2 mt-5 text-sm text-green-200">
             <a href="{{ route('home') }}" class="hover:text-white">Beranda</a>
             <i class="fas fa-chevron-right text-xs"></i>
-            <span class="text-white font-semibold">Promo</span>
+            <span class="text-white font-semibold">Promosi rumah sakit</span>
         </nav>
     </div>
 </div>
